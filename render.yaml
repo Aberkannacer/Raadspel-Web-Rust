@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: raadspel
+    env: rust
+    buildCommand: cargo build --release
+    startCommand: ./target/release/raadspelmetweb
+    envVars:
+      - key: RUST_LOG
+        value: info 
