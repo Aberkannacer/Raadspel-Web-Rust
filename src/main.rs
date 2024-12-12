@@ -11,17 +11,16 @@ use std::env;
 async fn main() -> std::io::Result<()> {
     let data = web::Data::new(AppState::new());
     
-    // Krijg PORT van environment variable (voor Heroku) of gebruik 8080 als fallback
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let server_url = format!("0.0.0.0:{}", port);
 
-    println!("\n🚀 Server is running!");
-    println!("📱 Server listening on: http://{}", server_url);
+    println!("\n🚀 Server starting on {}", server_url);
     
     HttpServer::new(move || {
         App::new()
+            .wrap(actix_web::middleware::Logger::default())
             .app_data(data.clone())
-            .service(Files::new("/static", "./static"))
+            .service(Files::new("/static", "./static").show_files_listing())
             .route("/health", web::get().to(routes::health_check))
             .route("/", web::get().to(routes::index))
             .route("/guess", web::post().to(routes::guess))

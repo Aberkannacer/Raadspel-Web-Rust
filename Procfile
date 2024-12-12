@@ -1,1 +1,1 @@
-web: ./target/release/raadspelmetweb 
+web: ./target/release/raadspelmetweb
