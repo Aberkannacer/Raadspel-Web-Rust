@@ -66,3 +66,7 @@ pub async fn guess(
         .insert_header((header::LOCATION, "/"))
         .finish()
 }
+
+pub async fn health_check() -> HttpResponse {
+    HttpResponse::Ok().body("Server is running!")
+}

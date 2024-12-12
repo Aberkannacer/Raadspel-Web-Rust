@@ -22,6 +22,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(data.clone())
             .service(Files::new("/static", "./static"))
+            .route("/health", web::get().to(routes::health_check))
             .route("/", web::get().to(routes::index))
             .route("/guess", web::post().to(routes::guess))
     })
