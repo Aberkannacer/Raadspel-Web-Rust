@@ -7,6 +7,8 @@ services:
     envVars:
       - key: RUST_LOG
         value: debug
+      - key: PORT
+        value: "3000"
     staticPublishPath: ./static
     healthCheckPath: /health
     autoDeploy: true
