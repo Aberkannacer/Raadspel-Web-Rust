@@ -1,16 +1,13 @@
 use actix_files::Files;
-use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use actix_web::{web, App, HttpServer};
 use std::env;
 
-mod state;
 mod routes;
+mod state;
 mod templates;
 
+use routes::{health_check, index, guess};
 use state::AppState;
-
-async fn health_check() -> impl Responder {
-    HttpResponse::Ok().body("Server is running!")
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -26,8 +23,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(data.clone()) // Deel de state tussen routes
             .service(Files::new("/static", "./static")) // Serveer statische bestanden
-            .route("/", web::get().to(routes::index)) // Hoofdpagina
-            .route("/guess", web::post().to(routes::guess)) // Raad-route
+            .route("/", web::get().to(index)) // Hoofdpagina
+            .route("/guess", web::post().to(guess)) // Raad-route
             .route("/health", web::get().to(health_check)) // Health check route
     })
     .bind(&address)? // Bind de server aan het adres

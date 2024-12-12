@@ -1,38 +1,22 @@
-use actix_web::{web, HttpResponse, http::header};
+use rand::Rng;
+use actix_web::{web, HttpResponse};
 use crate::state::AppState;
 use crate::templates;
-use rand::Rng;
-
 
 pub async fn index(state: web::Data<AppState>) -> HttpResponse {
-    let feedback = state.last_feedback.lock().unwrap().clone();
-    templates::render_page(&feedback, &state)
+    templates::render_page("Welkom bij het Raadspel! Raad het getal tussen 1 en 100:", &state)
 }
 
 pub async fn guess(
     state: web::Data<AppState>,
     form: web::Form<std::collections::HashMap<String, String>>,
 ) -> HttpResponse {
-    if !form.contains_key("guess") {
-        return HttpResponse::SeeOther()
-            .insert_header((header::LOCATION, "/"))
-            .finish();
-    }
-
     let guess: u32 = match form.get("guess").and_then(|g| g.parse().ok()) {
         Some(num) => num,
         None => {
-            return HttpResponse::SeeOther()
-                .insert_header((header::LOCATION, "/"))
-                .finish();
+            return templates::render_page("Ongeldige invoer! Voer een geldig getal in.", &state);
         }
     };
-
-    if guess < 1 || guess > 100 {
-        return HttpResponse::SeeOther()
-            .insert_header((header::LOCATION, "/"))
-            .finish();
-    }
 
     let mut secret_number = state.secret_number.lock().unwrap();
     {
@@ -45,9 +29,9 @@ pub async fn guess(
     }
 
     let feedback = if guess < *secret_number {
-        "Te laag! Probeer opnieuw."
+        "Te laag! Probeer opnieuw.".to_string()
     } else if guess > *secret_number {
-        "Te hoog! Probeer opnieuw."
+        "Te hoog! Probeer opnieuw.".to_string()
     } else {
         let mut scoreboard = state.scoreboard.lock().unwrap();
         scoreboard.insert(*secret_number, *state.attempts.lock().unwrap());
@@ -57,14 +41,10 @@ pub async fn guess(
         *state.attempts.lock().unwrap() = 0;
 
         "Gefeliciteerd! Je hebt het juiste getal geraden. Een nieuw getal is gegenereerd!"
+            .to_string()
     };
 
-    let mut last_feedback = state.last_feedback.lock().unwrap();
-    *last_feedback = feedback.to_string();
-
-    HttpResponse::SeeOther()
-        .insert_header((header::LOCATION, "/"))
-        .finish()
+    templates::render_page(&feedback, &state)
 }
 
 pub async fn health_check() -> HttpResponse {
