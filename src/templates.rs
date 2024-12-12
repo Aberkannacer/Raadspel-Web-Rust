@@ -37,7 +37,7 @@ pub fn render_page(feedback: &str, state: &AppState) -> HttpResponse {
                 <h2>Huidige Pogingen</h2>
                 <p>Aantal pogingen: {}</p>
                 <ul>{}</ul>
-                <h2>Permanent Scorebord</h2>
+                <h2>Scorebord</h2>
                 <ul>{}</ul>
             </body>
         </html>
